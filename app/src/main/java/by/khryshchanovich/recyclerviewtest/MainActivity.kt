@@ -2,58 +2,76 @@ package by.khryshchanovich.recyclerviewtest
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
+import by.khryshchanovich.recyclerviewtest.adapter.ImageAdapter
+import by.khryshchanovich.recyclerviewtest.adapter.RecyclerViewPagerAdapter
 import by.khryshchanovich.recyclerviewtest.databinding.ActivityMainBinding
-import java.util.*
+import by.khryshchanovich.recyclerviewtest.util.COLUMN_PAGE
+import by.khryshchanovich.recyclerviewtest.util.ROW_PAGE
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var recycler: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        initializeRecyclerView()
         showImages()
-    }
-
-    private fun initializeRecyclerView() {
-        recycler = binding.recyclerView
-        recycler.layoutManager = GridLayoutManager(
-            this,
-            10,
-            GridLayoutManager.HORIZONTAL,
-            false
-        )
     }
 
     private fun showImages() {
         var clickNumberAddButton = 0
-        val imageListAddButton = ArrayList<String>()
-        val imageListReloadAllButton = ArrayList<String>()
-
+        val imageList = ArrayList<String>()
         binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.add -> {
                     clickNumberAddButton++
-                    imageListAddButton.add(BASE_URL.plus(clickNumberAddButton))
-                    recycler.adapter = Adapter(imageListAddButton)
+                    if (imageList.isNotEmpty()) {
+                        imageList.add(BASE_URL.plus(clickNumberAddButton))
+                        initView(imageList)
+                    }
                     true
                 }
                 R.id.reloadAll -> {
-                    imageListAddButton.clear()
+                    imageList.clear()
                     for (i in 1..IMAGE_NUMBER) {
-                        imageListReloadAllButton.add(BASE_URL.plus(i))
+                        imageList.add(BASE_URL.plus(i))
                     }
-                    recycler.adapter = Adapter(imageListReloadAllButton)
+                    initView(imageList)
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    private fun initView(imageList: ArrayList<String>) {
+        val singlePageImageNumber = ROW_PAGE * COLUMN_PAGE
+        var pageNumber = imageList.size / singlePageImageNumber
+        if (imageList.size % singlePageImageNumber > 0) {
+            pageNumber++
+        }
+        val recyclerViewList = ArrayList<RecyclerView>()
+        for (i in 0 until pageNumber) {
+            val fromIndex = i * singlePageImageNumber
+            var toIndex = (i + 1) * singlePageImageNumber
+            if (toIndex > imageList.size) {
+                toIndex = imageList.size
+            }
+            val imageSubList = ArrayList(imageList.subList(fromIndex, toIndex))
+            val recyclerView = RecyclerView(this).apply {
+                layoutManager = GridLayoutManager(
+                    context,
+                    10,
+                    GridLayoutManager.HORIZONTAL,
+                    false
+                )
+                adapter = ImageAdapter(imageSubList)
+            }
+            recyclerViewList.add(recyclerView)
+        }
+        binding.viewPager.adapter = RecyclerViewPagerAdapter(recyclerViewList)
     }
 
     companion object {

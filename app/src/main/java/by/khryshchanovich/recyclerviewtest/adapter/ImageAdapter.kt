@@ -1,23 +1,25 @@
-package by.khryshchanovich.recyclerviewtest
+package by.khryshchanovich.recyclerviewtest.adapter
 
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.recyclerview.widget.RecyclerView
 import by.khryshchanovich.recyclerviewtest.databinding.ItemImageBinding
-import com.bumptech.glide.Glide
+import by.khryshchanovich.recyclerviewtest.glide.GlideApp
+import by.khryshchanovich.recyclerviewtest.util.setImageViewSize
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import java.util.*
 
-class Adapter(private val imageList: ArrayList<String>) :
-    RecyclerView.Adapter<Adapter.ViewHolder>() {
+class ImageAdapter(private val imageList: ArrayList<String>) :
+    RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemImageBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return ViewHolder(binding)
     }
 
@@ -32,7 +34,8 @@ class Adapter(private val imageList: ArrayList<String>) :
     class ViewHolder(private val binding: ItemImageBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(image: String) {
-            Glide.with(binding.root.context)
+            setImageViewSize(binding)
+            GlideApp.with(binding.root.context)
                 .load(image)
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
@@ -56,6 +59,7 @@ class Adapter(private val imageList: ArrayList<String>) :
                     }
                 })
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .centerCrop()
                 .into(binding.imageView)
         }
