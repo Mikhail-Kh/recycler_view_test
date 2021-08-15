@@ -5,7 +5,7 @@ import android.view.*
 import androidx.recyclerview.widget.RecyclerView
 import by.khryshchanovich.recyclerviewtest.databinding.ItemImageBinding
 import by.khryshchanovich.recyclerviewtest.glide.GlideApp
-import by.khryshchanovich.recyclerviewtest.util.setImageViewSize
+import by.khryshchanovich.recyclerviewtest.util.initCardViewSize
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
@@ -34,7 +34,7 @@ class ImageAdapter(private val imageList: ArrayList<String>) :
     class ViewHolder(private val binding: ItemImageBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(image: String) {
-            setImageViewSize(binding)
+            initCardViewSize(binding)
             GlideApp.with(binding.root.context)
                 .load(image)
                 .listener(object : RequestListener<Drawable> {
